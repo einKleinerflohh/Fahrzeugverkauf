@@ -1,273 +1,332 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+using System.IO;
+using System.Web.Script.Serialization;
 
 namespace Fahrzeugverkauf
 {
+    public class HaendlerDto
+    {
+        public string haendlerName { get; set; }
+    }
+
+    public class FahrzeugDto
+    {
+        public string typ { get; set; }
+        public string haendlerName { get; set; }
+        public string marke { get; set; }
+        public string modell { get; set; }
+        public double leistungInPS { get; set; }
+        public double tankInLiter { get; set; }
+        public double preis { get; set; }
+        public int anzahlSitzplaetze { get; set; }
+    }
+
     class Program
     {
         static void Main(string[] args)
         {
-            // Hinweis: Dieses Programm ist vollständig fiktional inklusive aller Namen, Adressen und Kontostände.
+            Console.WriteLine("=== FAHRZEUGVERKAUF & VERHANDLUNGSSYSTEM (JSON Edition) ===");
 
-            // Händler-Instanzen mit unterschiedlichen Namen und individuellen Geduldswerten anlegen
-            Haendler haendler1 = new Haendler("Autohaus Müller", 2);          // Geringe Geduld (2)
-            Haendler haendler2 = new Haendler("Gebrauchtwagen-Paradies", 3); // Normale Geduld (3)
-            Haendler haendler3 = new Haendler("Zweirad & Auto Schmidt", 5);  // Hohe Geduld (5)
+            List<Haendler> haendlerListe = new List<Haendler>();
+            Random rnd = new Random();
 
-            List<Haendler> haendlerListe = new List<Haendler> { haendler1, haendler2, haendler3 };
+            // Definition des Speicherorts: Ein Unterordner namens "Data" im Programmverzeichnis
+            string dataDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
 
-            // Befüllen des Fahrzeugbestands für Händler 1
-            haendler1.fahrzeugHinzufuegen(new Auto("Audi", "A4", 190, 50.0, 32000.0, 5));
-            haendler1.fahrzeugHinzufuegen(new Auto("BMW", "M3", 480, 60.0, 75000.0, 5));
-            haendler1.fahrzeugHinzufuegen(new Auto("Porsche", "911 Carrera", 385, 64.0, 115000.0, 2));
-            haendler1.fahrzeugHinzufuegen(new Motorrad("Yamaha", "MT-07", 73.4, 14.0, 7999.0));
-
-            // Befüllen des Fahrzeugbestands für Händler 2
-            haendler2.fahrzeugHinzufuegen(new Auto("Volkswagen", "Golf VII", 150, 50.0, 18500.0, 5));
-            haendler2.fahrzeugHinzufuegen(new Auto("Skoda", "Octavia", 150, 55.0, 21000.0, 5));
-            haendler2.fahrzeugHinzufuegen(new Auto("Fiat", "500", 69, 35.0, 9500.0, 4));
-            haendler2.fahrzeugHinzufuegen(new Motorrad("Honda", "Forza 75", 58.6, 13.2, 13147.00));
-            haendler2.fahrzeugHinzufuegen(new Motorrad("BMW", "R 1250 GS", 136, 20.0, 18500.0));
-
-            // Befüllen des Fahrzeugbestands für Händler 3
-            haendler3.fahrzeugHinzufuegen(new Motorrad("Aprilia", "RS 660", 100, 15.0, 11000.0));
-            haendler3.fahrzeugHinzufuegen(new Motorrad("Kawasaki", "Z900", 125, 17.0, 9800.0));
-            haendler3.fahrzeugHinzufuegen(new Auto("Mercedes", "C 220", 194, 66.0, 29999.0, 5));
-            haendler3.fahrzeugHinzufuegen(new Auto("Tesla", "Model 3", 325, 50.0, 42000.0, 5));
-
-            // Programmstart: Kundendaten erfassen
-            Console.Clear();
-            Console.WriteLine("=== WILLKOMMEN BEIM FAHRZEUGVERKAUF ===");
-
-            Console.Write("Bitte gib deinen Vornamen ein: ");
-            string kundenVorname = Console.ReadLine();
-            Console.Write("Bitte gib deinen Nachnamen ein: ");
-            string kundenName = Console.ReadLine();
-
-            double kundenBudget = 0;
-            bool gueltigesBudget = false;
-
-            while (!gueltigesBudget)
+            // Ordner automatisch erstellen, falls er nicht existiert
+            if (!Directory.Exists(dataDirectory))
             {
-                Console.Write("Bitte gib dein verfügbares Budget in Euro ein (z. B. 45000): ");
-                string budgetEingabe = Console.ReadLine();
+                Directory.CreateDirectory(dataDirectory);
+            }
 
-                if (double.TryParse(budgetEingabe, out kundenBudget) && kundenBudget >= 0)
+            string haendlerDatei = Path.Combine(dataDirectory, "haendler.json");
+            string autoDatei = Path.Combine(dataDirectory, "auto.json");
+
+            try
+            {
+                // 1. Händler aus Data/haendler.json laden und zufällige Geduld zuweisen
+                if (File.Exists(haendlerDatei))
                 {
-                    gueltigesBudget = true;
+                    string haendlerJson = File.ReadAllText(haendlerDatei);
+                    var serializer = new JavaScriptSerializer();
+                    var haendlerDtos = serializer.Deserialize<List<HaendlerDto>>(haendlerJson);
+
+                    foreach (var hDto in haendlerDtos)
+                    {
+                        int zufallsGeduld = rnd.Next(2, 6);
+                        haendlerListe.Add(new Haendler(hDto.haendlerName, zufallsGeduld));
+                    }
                 }
                 else
                 {
-                    Console.WriteLine("Ungültige Eingabe. Bitte gib eine gültige Zahl für dein Budget ein.");
+                    Console.WriteLine($"[Hinweis] '{haendlerDatei}' nicht gefunden. Standardwerte werden genutzt.");
+                    haendlerListe.Add(new Haendler("Autohaus Müller", rnd.Next(2, 6)));
+                    haendlerListe.Add(new Haendler("Gebrauchtwagen-Paradies", rnd.Next(2, 6)));
                 }
-            }
 
-            // Erstellen des Kunden-Objekts (beinhaltet nun standardmäßig auch eine Startgarage)
-            Kunde kunde = new Kunde(kundenVorname, kundenName, kundenBudget);
-            Console.WriteLine($"\nKunde erfolgreich angelegt!
-            Thread.Sleep(2000);
-
-            bool beenden = false;
-
-            // Hauptmenü-Schleife
-            while (!beenden)
-            {
-                Console.Clear();
-                Console.WriteLine("\n=== FAHRZEUGVERKAUF - HAUPTMENÜ ===");
-                Console.WriteLine($"Hallo {kunde.vorname} {kunde.name}, dein Budget beträgt {kunde.budget} EUR. Fahrzeuge in Garage: {kunde.fahrzeugGarage.Count}");
-                Console.WriteLine("[1] Alle Händler und deren Bestände anzeigen");
-                Console.WriteLine("[2] Händler auswählen und Fahrzeug KAUFEN (verhandeln)");
-                Console.WriteLine("[3] Eigene Fahrzeuggarage anzeigen");
-                Console.WriteLine("[4] Fahrzeug an einen Händler VERKAUFEN (verhandeln)");
-                Console.WriteLine("[x] Beenden");
-                Console.Write("Bitte wähle eine Option: ");
-
-                string menueEingabe = Console.ReadLine();
-
-                switch (menueEingabe)
+                // 2. Fahrzeuge aus Data/auto.json laden und den Händlern zuordnen
+                if (File.Exists(autoDatei))
                 {
-                    case "1":
-                        Console.Clear();
-                        Console.WriteLine("\n=== ÜBERSICHT ALLER HÄNDLER UND ANGEBOTE ===");
-                        foreach (var h in haendlerListe)
+                    string autoJson = File.ReadAllText(autoDatei);
+                    var serializer = new JavaScriptSerializer();
+                    var fahrzeugDtos = serializer.Deserialize<List<FahrzeugDto>>(autoJson);
+
+                    foreach (var fDto in fahrzeugDtos)
+                    {
+                        Fahrzeug neuesFahrzeug;
+                        if (fDto.typ.Equals("Auto", StringComparison.OrdinalIgnoreCase))
                         {
-                            h.bestandAnzeigen();
+                            neuesFahrzeug = new Auto(fDto.marke, fDto.modell, fDto.leistungInPS, fDto.tankInLiter, fDto.preis, fDto.anzahlSitzplaetze);
                         }
-                        Console.WriteLine("\nDrücke eine beliebige Taste, um zum Hauptmenü zurückzukehren...");
-                        Console.ReadKey();
-                        break;
-
-                    case "2": // Fahrzeug kaufen
-                        bool haendlerZurueck = false;
-                        while (!haendlerZurueck)
+                        else
                         {
-                            Console.Clear();
-                            Console.WriteLine("\n=== HÄNDLER-AUSWAHL (FAHRZEUG KAUFEN) ===");
-                            for (int i = 0; i < haendlerListe.Count; i++)
-                            {
-                                Console.WriteLine($"[{i + 1}] {haendlerListe[i].haendlerName} (Geduld: {haendlerListe[i].geduld})");
-                            }
-                            Console.WriteLine("[x] Zurück zum Hauptmenü");
-                            Console.Write("Wähle einen Händler aus: ");
-
-                            string hAuswahlEingabe = Console.ReadLine();
-
-                            if (hAuswahlEingabe.ToLower() == "x")
-                            {
-                                haendlerZurueck = true;
-                                break;
-                            }
-
-                            if (int.TryParse(hAuswahlEingabe, out int hIndex) && hIndex >= 1 && hIndex <= haendlerListe.Count)
-                            {
-                                Haendler gewaehlterHaendler = haendlerListe[hIndex - 1];
-                                bool fahrzeugZurueck = false;
-
-                                while (!fahrzeugZurueck)
-                                {
-                                    Console.Clear();
-                                    gewaehlterHaendler.bestandAnzeigen();
-                                    Console.WriteLine($"Dein Budget: {kunde.budget} EUR.");
-                                    Console.WriteLine("Gib die Nummer des Fahrzeugs ein, das du kaufen möchtest.");
-                                    Console.WriteLine("Gib 'x' ein, um zur Händler-Auswahl zurückzukehren.");
-                                    Console.Write("\nEingabe: ");
-
-                                    string fahrzeugEingabe = Console.ReadLine();
-
-                                    if (fahrzeugEingabe.ToLower() == "x")
-                                    {
-                                        fahrzeugZurueck = true;
-                                    }
-                                    else
-                                    {
-                                        List<Fahrzeug> bestand = gewaehlterHaendler.getBestand();
-
-                                        if (int.TryParse(fahrzeugEingabe, out int fIndex) && fIndex >= 1 && fIndex <= bestand.Count)
-                                        {
-                                            Fahrzeug gewaehltesFahrzeug = bestand[fIndex - 1];
-                                            kunde.preisvorschlagAbgeben(gewaehltesFahrzeug, gewaehlterHaendler);
-
-                                            Console.WriteLine("\nDrücke eine beliebige Taste, um fortzufahren...");
-                                            Console.ReadKey();
-                                            fahrzeugZurueck = true;
-                                        }
-                                        else
-                                        {
-                                            Console.WriteLine("Ungültige Fahrzeugnummer. Bitte versuche es erneut.");
-                                            Thread.Sleep(2000);
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                Console.WriteLine("Ungültige Händlerauswahl. Bitte versuche es erneut.");
-                                Thread.Sleep(2000);
-                            }
-                        }
-                        break;
-
-                    case "3": // Eigene Garage anzeigen
-                        Console.Clear();
-                        kunde.garageAnzeigen();
-                        Console.WriteLine("Drücke eine beliebige Taste, um zum Hauptmenü zurückzukehren...");
-                        Console.ReadKey();
-                        break;
-
-                    case "4": // Fahrzeug an Händler verkaufen
-                        if (kunde.fahrzeugGarage.Count == 0)
-                        {
-                            Console.Clear();
-                            Console.WriteLine("\nDeine Garage ist leer. Du hast aktuell kein Fahrzeug, das du verkaufen könntest!");
-                            Console.WriteLine("\nDrücke eine beliebige Taste...");
-                            Console.ReadKey();
-                            break;
+                            neuesFahrzeug = new Motorrad(fDto.marke, fDto.modell, fDto.leistungInPS, fDto.tankInLiter, fDto.preis);
                         }
 
-                        bool verkaufHaendlerZurueck = false;
-                        while (!verkaufHaendlerZurueck)
+                        var zielHaendler = haendlerListe.Find(h => h.haendlerName.Equals(fDto.haendlerName, StringComparison.OrdinalIgnoreCase));
+                        if (zielHaendler != null)
                         {
-                            Console.Clear();
-                            Console.WriteLine("\n=== HÄNDLER-AUSWAHL (FAHRZEUG VERKAUFEN) ===");
-                            for (int i = 0; i < haendlerListe.Count; i++)
-                            {
-                                Console.WriteLine($"[{i + 1}] {haendlerListe[i].haendlerName}");
-                            }
-                            Console.WriteLine("[x] Zurück zum Hauptmenü");
-                            Console.Write("Wähle einen Händler für den Verkauf aus: ");
-
-                            string vHaendlerEingabe = Console.ReadLine();
-
-                            if (vHaendlerEingabe.ToLower() == "x")
-                            {
-                                verkaufHaendlerZurueck = true;
-                                break;
-                            }
-
-                            if (int.TryParse(vHaendlerEingabe, out int vHIndex) && vHIndex >= 1 && vHIndex <= haendlerListe.Count)
-                            {
-                                Haendler verkaufsHaendler = haendlerListe[vHIndex - 1];
-                                bool fahrzeugWahlZurueck = false;
-
-                                while (!fahrzeugWahlZurueck)
-                                {
-                                    Console.Clear();
-                                    kunde.garageAnzeigen();
-                                    Console.WriteLine("Gib die Nummer des Fahrzeugs aus deiner Garage ein, das du verkaufen möchtest.");
-                                    Console.WriteLine("Gib 'x' ein, um zurückzukehren.");
-                                    Console.Write("\nEingabe: ");
-
-                                    string kFahrzeugEingabe = Console.ReadLine();
-
-                                    if (kFahrzeugEingabe.ToLower() == "x")
-                                    {
-                                        fahrzeugWahlZurueck = true;
-                                    }
-                                    else
-                                    {
-                                        if (int.TryParse(kFahrzeugEingabe, out int kFIndex) && kFIndex >= 1 && kFIndex <= kunde.fahrzeugGarage.Count)
-                                        {
-                                            Fahrzeug zuVerkaufendesFahrzeug = kunde.fahrzeugGarage[kFIndex - 1];
-                                            kunde.fahrzeugVerkaufen(zuVerkaufendesFahrzeug, verkaufsHaendler);
-
-                                            Console.WriteLine("\nDrücke eine beliebige Taste, um fortzufahren...");
-                                            Console.ReadKey();
-                                            fahrzeugWahlZurueck = true;
-                                            verkaufHaendlerZurueck = true;
-                                        }
-                                        else
-                                        {
-                                            Console.WriteLine("Ungültige Fahrzeugnummer. Bitte versuche es erneut.");
-                                            Thread.Sleep(2000);
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                Console.WriteLine("Ungültige Händlerauswahl.");
-                                Thread.Sleep(2000);
-                            }
+                            zielHaendler.fahrzeugHinzufuegen(neuesFahrzeug);
                         }
-                        break;
-
-                    case "x":
-                        beenden = true;
-                        Console.Clear();
-                        Console.WriteLine("\nProgramm wird beendet. Auf Wiedersehen!");
-                        Thread.Sleep(2000);
-                        break;
-
-                    default:
-                        Console.WriteLine("\nUngültige Wahl. Bitte wähle eine der vorgegebenen Optionen.");
-                        Thread.Sleep(2000);
-                        break;
+                        else if (haendlerListe.Count > 0)
+                        {
+                            haendlerListe[0].fahrzeugHinzufuegen(neuesFahrzeug);
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"[Hinweis] '{autoDatei}' nicht gefunden.");
                 }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Fehler beim Laden der JSON-Dateien]: {ex.Message}");
+            }
+
+            Kunde kunde = new Kunde("Max", "Mustermann", 15000.0);
+
+            Menu menu = new Menu(haendlerListe, kunde);
+            menu.StarteHauptmenue();
+        }
+
+        public static void ZeigeHauptmenue(Kunde k)
+        {
+            Console.WriteLine($"\n--- HAUPTMENÜ --- (Kunde: {k.vorname} {k.name} | Budget: {k.budget} EUR)");
+            Console.WriteLine("[1] Alle Händler & Bestände anzeigen");
+            Console.WriteLine("[2] Fahrzeug bei einem Händler kaufen (Verhandeln)");
+            Console.WriteLine("[3] Eigene Garage anzeigen");
+            Console.WriteLine("[4] Fahrzeug an einen Händler verkaufen");
+            Console.WriteLine("[x] Programm beenden");
+        }
+
+        public static string LeseEingabe(string text)
+        {
+            Console.Write(text);
+            return Console.ReadLine();
+        }
+
+        public static void PrintNachricht(string msg) => Console.WriteLine($"\n[Hinweis] {msg}\n");
+
+        public static void ZeigeAlleHaendlerBestaende(List<Haendler> haendlerListe)
+        {
+            foreach (var h in haendlerListe)
+            {
+                Console.WriteLine($"\n--- Händler: {h.haendlerName} (Geduld: {h.geduld}) ---");
+                var bestand = h.getBestand();
+                if (bestand.Count == 0) Console.WriteLine("  Keine Fahrzeuge im Bestand.");
+                else
+                {
+                    for (int i = 0; i < bestand.Count; i++)
+                    {
+                        Console.Write($"  [{i + 1}] ");
+                        bestand[i].fahrzeugAnzeigen();
+                    }
+                }
+            }
+        }
+
+        public static void ZeigeHaendlerAuswahl(List<Haendler> haendlerListe)
+        {
+            Console.WriteLine("\n--- HÄNDLER-AUSWAHL (KAUF) ---");
+            for (int i = 0; i < haendlerListe.Count; i++)
+            {
+                Console.WriteLine($"[{i + 1}] {haendlerListe[i].haendlerName} (Geduld: {haendlerListe[i].geduld})");
+            }
+            Console.WriteLine("[x] Zurück");
+        }
+
+        public static void ZeigeHaendlerAuswahlVerkauf(List<Haendler> haendlerListe)
+        {
+            Console.WriteLine("\n--- HÄNDLER-AUSWAHL (VERKAUF) ---");
+            for (int i = 0; i < haendlerListe.Count; i++)
+            {
+                Console.WriteLine($"[{i + 1}] {haendlerListe[i].haendlerName}");
+            }
+            Console.WriteLine("[x] Zurück");
+        }
+
+        public static void ZeigeHaendlerBestand(Haendler h)
+        {
+            Console.WriteLine($"\n--- Bestand von {h.haendlerName} ---");
+            var bestand = h.getBestand();
+            for (int i = 0; i < bestand.Count; i++)
+            {
+                Console.Write($"[{i + 1}] ");
+                bestand[i].fahrzeugAnzeigen();
+            }
+        }
+
+        public static void ZeigeGarage(Kunde k) => k.garageAnzeigen();
+        public static void ZeigeGarageLeereMeldung() => Console.WriteLine("\nDeine Garage ist leer. Du hast keine Fahrzeuge zum Verkaufen.\n");
+        public static void BeendenAusgabe() => Console.WriteLine("\nVielen Dank fürs Spielen! Programm wird beendet.");
+
+        public static void FuehreKaufVerhandlung(Haendler h, Fahrzeug f, Kunde k)
+        {
+            int maxVersuche = h.GeneriereMaxVersuche();
+            int verbleibendeGeduld = h.geduld;
+            double aktuellerPreis = f.preis;
+
+            Console.WriteLine($"\n=== Verhandlung mit {h.haendlerName} ===");
+            Console.WriteLine($"Fahrzeug: {f.marke} {f.modell} | Preis: {aktuellerPreis} EUR");
+
+            for (int runde = 1; runde <= maxVersuche; runde++)
+            {
+                Console.WriteLine($"\n--- Runde {runde} von {maxVersuche} (Geduld des Händlers: {verbleibendeGeduld}) ---");
+                Console.WriteLine("Aktionen: [1] Gebot abgeben | [2] Argument anbringen | [3] Barzahlungs-Joker nutzen | [x] Abbrechen");
+                string wahl = LeseEingabe("Wähle eine Aktion: ").ToLower();
+
+                if (wahl == "x")
+                {
+                    Console.WriteLine("Du hast die Verhandlung abgebrochen.");
+                    return;
+                }
+
+                if (!int.TryParse(wahl, out int aktion) || aktion < 1 || aktion > 3)
+                {
+                    Console.WriteLine("Ungültige Aktion.");
+                    runde--;
+                    continue;
+                }
+
+                double inputVal = 0;
+                if (aktion == 1)
+                {
+                    string inputStr = LeseEingabe("Dein Preisvorschlag in EUR: ");
+                    if (!double.TryParse(inputStr, out inputVal)) { Console.WriteLine("Ungültige Eingabe."); runde--; continue; }
+                }
+
+                VerhandlungsErgebnis ergebnis = h.VerarbeiteVerhandlung(true, f, aktion, inputVal, ref aktuellerPreis, ref verbleibendeGeduld);
+
+                if (ergebnis == VerhandlungsErgebnis.Frechheit)
+                {
+                    Console.WriteLine($"\nDer Händler ist empört über dieses unverschämte Gebot und schmeißt dich raus! Verhandlung gescheitert.");
+                    return;
+                }
+                if (ergebnis == VerhandlungsErgebnis.Deal)
+                {
+                    if (k.budget < aktuellerPreis)
+                    {
+                        Console.WriteLine($"\nDer Händler akzeptiert {aktuellerPreis} EUR, aber dein Budget reicht leider nicht aus!");
+                        return;
+                    }
+                    k.budget -= aktuellerPreis;
+                    h.fahrzeugEntfernen(f);
+                    k.fahrzeugGarage.Add(f);
+                    Console.WriteLine($"\nGlückwunsch! Kaufvertrag abgeschlossen für {aktuellerPreis} EUR. Das Fahrzeug wurde deiner Garage hinzugefügt.");
+                    Console.WriteLine($"Neues Budget: {k.budget} EUR");
+                    return;
+                }
+                if (ergebnis == VerhandlungsErgebnis.Entgegenkommen)
+                {
+                    Console.WriteLine($"Der Händler lässt sich auf einen neuen Preis ein: {aktuellerPreis} EUR.");
+                }
+                else if (ergebnis == VerhandlungsErgebnis.ArgumentAngenommen)
+                {
+                    Console.WriteLine($"Dein Argument hat gewirkt! Neuer Preis: {aktuellerPreis} EUR.");
+                }
+                else if (ergebnis == VerhandlungsErgebnis.ArgumentAbgelehnt)
+                {
+                    Console.WriteLine("Der Händler lässt sich von deinem Argument nicht beeindrucken und verliert die Geduld.");
+                }
+                else if (ergebnis == VerhandlungsErgebnis.BarAngebotBerechnet)
+                {
+                    Console.WriteLine($"Barzahlungs-Joker eingesetzt! Der Händler bietet sofort: {aktuellerPreis} EUR.");
+                }
+
+                if (verbleibendeGeduld <= 0)
+                {
+                    Console.WriteLine("\nDer Händler hat keine Geduld mehr und bricht das Gespräch ab!");
+                    return;
+                }
+            }
+            Console.WriteLine("\nKeine Einigung erzielt. Die Verhandlungsrunden sind aufgebraucht.");
+        }
+
+        public static void FuehreAnkaufVerhandlung(Haendler h, Fahrzeug f, Kunde k)
+        {
+            int maxVersuche = 3;
+            int verbleibendeGeduld = h.geduld;
+            double aktuellerPreis = f.preis * 0.75;
+
+            Console.WriteLine($"\n=== Ankauf-Verhandlung mit {h.haendlerName} ===");
+            Console.WriteLine($"Dein Fahrzeug: {f.marke} {f.modell} | Startgebot des Händlers: {aktuellerPreis} EUR");
+
+            for (int runde = 1; runde <= maxVersuche; runde++)
+            {
+                Console.WriteLine($"\n--- Runde {runde} von {maxVersuche} ---");
+                Console.WriteLine("Aktionen: [1] Gegenvorschlag nennen | [2] Zustand betonen (Scheckheft/TÜV) | [3] Sofortverkauf zum Händlerpreis | [x] Abbrechen");
+                string wahl = LeseEingabe("Wähle eine Aktion: ").ToLower();
+
+                if (wahl == "x") { Console.WriteLine("Verhandlung abgebrochen."); return; }
+
+                if (!int.TryParse(wahl, out int aktion) || aktion < 1 || aktion > 3)
+                {
+                    Console.WriteLine("Ungültige Aktion.");
+                    runde--;
+                    continue;
+                }
+
+                double inputVal = 0;
+                if (aktion == 1)
+                {
+                    string inputStr = LeseEingabe("Dein Wunschpreis in EUR: ");
+                    if (!double.TryParse(inputStr, out inputVal)) { Console.WriteLine("Ungültige Eingabe."); runde--; continue; }
+                }
+
+                VerhandlungsErgebnis ergebnis = h.VerarbeiteVerhandlung(false, f, aktion, inputVal, ref aktuellerPreis, ref verbleibendeGeduld);
+
+                if (ergebnis == VerhandlungsErgebnis.Ueberzogen)
+                {
+                    Console.WriteLine("Deine Preisvorstellung war völlig überzogen. Der Händler bricht das Gespräch ab.");
+                    return;
+                }
+                if (ergebnis == VerhandlungsErgebnis.Deal)
+                {
+                    k.budget += aktuellerPreis;
+                    k.fahrzeugGarage.Remove(f);
+                    h.fahrzeugHinzufuegen(f);
+                    Console.WriteLine($"\nAnkauf erfolgreich! Du hast das Fahrzeug für {aktuellerPreis} EUR an {h.haendlerName} verkauft.");
+                    Console.WriteLine($"Neues Budget: {k.budget} EUR");
+                    return;
+                }
+                if (ergebnis == VerhandlungsErgebnis.Gegenvorschlag)
+                {
+                    Console.WriteLine($"Der Händler macht einen neuen Gegenvorschlag: {aktuellerPreis} EUR.");
+                }
+                else if (ergebnis == VerhandlungsErgebnis.ArgumentAngenommen)
+                {
+                    Console.WriteLine($"Der Händler erkennt den guten Zustand an. Neuer Preis: {aktuellerPreis} EUR.");
+                }
+
+                if (verbleibendeGeduld <= 0)
+                {
+                    Console.WriteLine("\nDem Händler platzt der Kragen. Gespräch beendet.");
+                    return;
+                }
+            }
+            Console.WriteLine("\nKeine Einigung beim Ankauf erzielt.");
         }
     }
 }
