@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Fahrzeugverkauf
 {
@@ -16,22 +13,28 @@ namespace Fahrzeugverkauf
         // Liste zur Verwaltung der Fahrzeuge, die sich aktuell im Besitz des Kunden befinden (Garage)
         public List<Fahrzeug> fahrzeugGarage { get; set; }
 
+        private static Random rnd = new Random();
+
         // Konstruktor zur Initialisierung der Kundenattribute und der Startgarage
         public Kunde(string nVorname, string nName, double nBudget)
         {
             vorname = nVorname;
             name = nName;
-            budget = nBudget;
+
+            // Startbudget variiert leicht um +/- 10% für mehr Unvorhersehbarkeit
+            double budgetFaktor = 0.9 + rnd.NextDouble() * 0.2;
+            budget = Math.Round(nBudget * budgetFaktor, 2);
+
             fahrzeugGarage = new List<Fahrzeug>();
 
-            // Dem Kunden wird zum Start ein gebrauchtes Fahrzeug in die Garage gestellt, damit er direkt Fahrzeuge verkaufen kann
+            // Dem Kunden wird zum Start ein gebrauchtes Fahrzeug in die Garage gestellt (nutzt die neuen Zustände der Basisklasse)
             fahrzeugGarage.Add(new Auto("Opel", "Corsa", 75, 45.0, 3500.0, 3));
         }
 
         // Gibt die Fahrzeuge in der Garage des Kunden formatiert auf der Konsole aus
         public void garageAnzeigen()
         {
-            Console.WriteLine($"\n--- Fahrzeuggarage von {vorname} {name} ---");
+            Console.WriteLine($"\n--- Fahrzeuggarage von {vorname} {name} (Budget: {budget} EUR) ---");
             if (fahrzeugGarage.Count == 0)
             {
                 Console.WriteLine("Deine Garage ist aktuell leer.");
@@ -46,17 +49,6 @@ namespace Fahrzeugverkauf
             }
             Console.WriteLine("--------------------------------------\n");
         }
-
-        // Leitet den Preisvorschlag bzw. Kauf an den ausgewählten Händler weiter
-        public void preisvorschlagAbgeben(Fahrzeug fahrzeug, Haendler haendler)
-        {
-            haendler.verhandlePreis(this, fahrzeug);
-        }
-
-        // Startet den Verhandlungsprozess zum Verkauf eines eigenen Fahrzeugs an einen Händler
-        public void fahrzeugVerkaufen(Fahrzeug fahrzeug, Haendler haendler)
-        {
-            haendler.verhandleAnkauf(this, fahrzeug);
-        }
     }
 }
+
