@@ -30,7 +30,7 @@ namespace Fahrzeugverkauf
             haendler2.fahrzeugHinzufuegen(new Auto("Volkswagen", "Golf VII", 150, 50.0, 18500.0, 5));
             haendler2.fahrzeugHinzufuegen(new Auto("Skoda", "Octavia", 150, 55.0, 21000.0, 5));
             haendler2.fahrzeugHinzufuegen(new Auto("Fiat", "500", 69, 35.0, 9500.0, 4));
-            haendler2.fahrzeugHinzufuegen(new Motorrad("Honda", "Forza 75", 58.6, 13.2, 13145.00));
+            haendler2.fahrzeugHinzufuegen(new Motorrad("Honda", "Forza 75", 58.6, 13.2, 13147.00));
             haendler2.fahrzeugHinzufuegen(new Motorrad("BMW", "R 1250 GS", 136, 20.0, 18500.0));
 
             // Befüllen des Fahrzeugbestands für Händler 3
