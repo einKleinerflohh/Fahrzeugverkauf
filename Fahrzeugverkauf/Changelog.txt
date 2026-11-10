@@ -1,0 +1,102 @@
+===============================================================================
+FAHRZEUGVERKAUF - CHANGELOG
+===============================================================================
+
+[V1.0.0] - Erstveröffentlichung
+-------------------------------------------------------------------------------------------------------------
+HINZUGEFÜGT:
+- Klassenstruktur für Fahrzeuge:
+  * Abstrakte Basisklasse 'Fahrzeug' (Marke, Modell, Leistung in PS, Tankgröße, Preis).
+  * Unterklasse 'Auto' mit zusätzlicher Eigenschaft (Anzahl Sitzplätze).
+  * Unterklasse 'Motorrad'.
+- Klasse 'Haendler':
+  * Verwaltung des Fahrzeugbestands (Hinzufügen, Entfernen, Bestand anzeigen).
+  * Logik zur Prüfung von Preisvorschlägen (Akzeptanz ab 90 % des Originalpreises).
+- Klasse 'Kunde':
+  * Verwaltung von Kundendaten (Vorname, Nachname, Budget).
+  * Abgabe von Preisvorschlägen.
+- Konsolen-Benutzeroberfläche (Program.cs):
+  * Erfassung der Kundendaten und Validierung des Budgets.
+  * Hauptmenü mit Optionen zur Anzeige des Bestands und zur Auswahl von Fahrzeugen.
+  * Automatisches Abziehen des Kaufpreises vom Kundenbudget und Entfernen gekaufter Fahrzeuge aus dem Bestand.
+  * Vollständige Quellcode-Dokumentation aller Klassen und Methoden durch ausführliche Inline-Kommentare.
+
+
+[V1.1.0] - Erweiterung des Verhandlungssystems
+-------------------------------------------------------------------------------------------------------------
+HINZUGEFÜGT:
+- Interaktiver, mehrstufiger Verhandlungsprozess ('verhandlePreis' in Haendler.cs):
+  * Zufällige Ermittlung der maximalen Verhandlungsversuche pro Gespräch (2 bis 4 Runden).
+  * Dynamische Preisanpassung durch den Händler bei zu niedrigen Kundenvorschlägen (Schrittweises Entgegenkommen).
+  * Berücksichtigung einer festen Schmerzgrenze des Händlers (85 % des Originalpreises).
+  * Automatische Prüfung, ob das Kundenbudget für das abgegebene Angebot ausreicht.
+  * Abbruchoption für den Benutzer während der Verhandlung durch Eingabe von 'x'.
+
+GEÄNDERT:
+- Haendler.cs:
+  * Die Methode 'entscheidePreisvorschlag' wurde durch die umfassende Verhandlungs-Schleife 'verhandlePreis' ersetzt.
+  * Integration eines Random-Generators zur Bestimmung der Rundenanzahl.
+- Kunde.cs:
+  * Anpassung von 'preisvorschlagAbgeben', um den interaktiven Verhandlungsablauf im Händler zu starten.
+- Program.cs:
+  * Integration der Verhandlungslogik in die Menüführung bei der Fahrzeugauswahl.
+  * Entfernung der vorherigen starren Einmal-Vorschlag-Abfrage.
+  * Vollständige Quellcode-Dokumentation aller Klassen und Methoden durch ausführliche Inline-Kommentare.
+
+
+[V2.0.0] - Mehrere Händler & Erweitertes Fahrzeugangebot
+-------------------------------------------------------------------------------------------------------------
+HINZUGEFÜGT:
+- Unterstützung für mehrere Händler:
+  * Attribut 'haendlerName' in der Klasse 'Haendler' zur eindeutigen Identifikation.
+  * Erweiterung von Program.cs um Händler-Instanzen ("Autohaus Müller", "Gebrauchtwagen-Paradies", "Zweirad & Auto Schmidt").
+- Deutlich vergrößertes Fahrzeugangebot mit verschiedenen Autos und Motorrädern je Händler.
+- Neue Händlerauswahl-Ebene im Hauptmenü sowie Option zur Gesamtübersicht aller Bestände.
+
+GEÄNDERT:
+- Haendler.cs:
+  * Ausgaben im Konsolenfenster beinhalten nun den jeweiligen Händlernamen.
+- Program.cs:
+  * Überarbeitung des Hauptmenüs und der Navigation zur Auswahl des gewünschten Händlers vor Beginn einer Verhandlung.
+
+
+[V2.1.0] - Interaktive Verhandlungsstrategien & Individuelle Händler-Geduld
+-------------------------------------------------------------------------------------------------------------
+HINZUGEFÜGT:
+- Erweiterte Verhandlungsstrategien und taktische Optionen in 'Haendler.cs':
+  * Auswahlmöglichkeit pro Runde: [1] Konkretes Gebot abgeben, [2] Argument anbringen oder [3] Barzahlungs-Joker nutzen.
+  * Argumente-System: Zustand des Fahrzeugs bemängeln (sicherer kleiner Rabatt) oder Konkurrenzdruck ausüben (Risiko mit Chance auf größeren Rabatt).
+  * Barzahlungs-Joker: Sofortkauf-Rabatt gegen direkte Barzahlung, sofern das Kundenbudget ausreicht.
+- Individuelles Händler-Geduldssystem (Eigenschaft 'geduld' in 'Haendler.cs'):
+  * Jeder Händler besitzt eine eigene Geduld (z. B. Autohaus Müller = 2, Gebrauchtwagen-Paradies = 3, Zweirad & Auto Schmidt = 5).
+  * Geduld sinkt bei unfairen Aktionen, Fehlschlägen oder unpassenden Argumenten.
+  * Führt beim Erschöpfen der Geduld zum automatischen Verhandlungsabbruch.
+- Sofortiger Verhandlungsabbruch ("Frechheitsgrenze"):
+  * Wenn ein Kundengebot unter 70 % des Originalpreises liegt, bricht der Händler das Gespräch sofort empört ab.
+
+GEÄNDERT:
+- Haendler.cs:
+  * Erweiterung des Konstruktors um den Parameter 'startGeduld' zur Festlegung der individuellen Geduld pro Händler.
+  * Umgestaltung des Verhandlungsablaufs zu einem rundenbasierten Menüsystem mit variabler Rundenanzahl (3 bis 5 Versuche).
+  * Anpassung der Schmerzgrenze des Händlers auf 82 % des Originalpreises.
+- Program.cs:
+  * Anpassung aller Händler-Instanziierungen zur Übergabe des individuellen Geduldswerts beim Erstellen der Objekte.
+- Code-Dokumentation:
+  * Aktualisierung und Ergänzung sämtlicher Inline-Kommentare für die neuen interaktiven Verhandlungs- und Strategiefunktionen.
+
+  [V2.2.0] - Fahrzeugverkauf durch Kunden (Ankauf-System)
+-------------------------------------------------------------------------------------------------------------
+HINZUGEFÜGT:
+- Klasse 'Kunde':
+  * Integration einer eigenen Fahrzeuggarage ('fahrzeugGarage') zur Verwaltung von Kundenfahrzeugen.
+  * Startausstattung des Kunden mit einem gebrauchten Erstfahrzeug (Opel Corsa) zum direkten Testen des Verkaufs.
+  * Methode 'garageAnzeigen' zur übersichtlichen Darstellung der eigenen Fahrzeuge.
+- Klasse 'Haendler':
+  * Implementierung der Methode 'verhandleAnkauf' für den interaktiven Ankauf von Kundenfahrzeugen durch den Händler.
+  * Verhandlungslogik mit Startgebot des Händlers, Argumenten (z. B. Scheckheftpflege oder neuer TÜV) und individueller Händlerschmerzgrenze.
+  * Automatische Übernahme des Fahrzeugs in den Händlerbestand bei erfolgreichem Ankauf sowie Gutschrift des Erlöses auf das Kundenbudget.
+- Konsolen-Benutzeroberfläche (Program.cs):
+  * Neue Hauptmenü-Optionen zur Ansicht der eigenen Garage ([3]) und zum Verkauf eigener Fahrzeuge an einen Händler ([4]).
+  * Vollständige Quellcode-Dokumentation aller neuen Funktionen durch ausführliche Inline-Kommentare.
+
+=============================================================================================================
