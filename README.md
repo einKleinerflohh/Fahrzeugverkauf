@@ -1,123 +1,102 @@
-Fahrzeugverkauf (Console Application)
+Fahrzeugverkauf Simulator
 
-Eine C#-Konsolenanwendung zur Simulation eines Fahrzeugverkaufs bei einem oder mehreren Autohändlern. Das Projekt demonstriert grundlegende Prinzipien der objektorientierten Programmierung (OOP) wie Vererbung, Kapselung und Datenverwaltung.
+Eine interaktive C#-Konsolenanwendung zur Simulation eines Fahrzeugmarkts. Das Projekt demonstriert den Einsatz von objektorientierter Programmierung (OOP) in .NET Framework mit Funktionen wie Fahrzeugkauf, Fahrzeugverkauf (Ankauf-System), dynamischen Verhandlungsstrategien und einer Garage-Verwaltung.
 
-Projektbeschreibung
+Hauptfunktionen
 
-Das Programm simuliert den Verkaufsprozess von Fahrzeugen zwischen Händlern und Kunden.
-Kunden können den Bestand der Händler einsehen, Preisvorschläge für gewünschte Fahrzeuge abgeben und Käufe tätigen. Der Händler entscheidet über die Annahme von Angeboten, während das System sicherstellt, dass das Kundenbudget ausreicht und der Fahrzeugbestand entsprechend aktualisiert wird.
+Objektorientierte Datenstruktur:
 
-Klassen & Objektstruktur
+Abstrakte Basisklasse Fahrzeug mit den Unterklassen Auto (inkl. Sitzplätzen) und Motorrad.
 
-Fahrzeuge (Fahrzeug)
+Modular aufgebautes Kunden- und Händlersystem.
 
-Basisklasse für alle Fahrzeuge im System.
+Interaktives Verhandlungssystem (Kauf):
 
-Gemeinsame Eigenschaften:
+Verschiedene Verhandlungsstrategien: Gebote abgeben, Argumente nutzen (Zustand bemängeln, Konkurrenzdruck) oder den Barzahlungs-Joker wählen.
 
-Marke (z. B. Audi, BMW, Aprilia, Honda)
+Dynamische Händler-Geduld: Geduld sinkt bei unfairen Geboten. Bei unter 70 % des Preises greift die "Frechheitsgrenze" (Abbruch).
 
-Leistung in PS
+Ankauf-System (Verkauf eigener Fahrzeuge):
 
-Tankgröße in Litern
+Verkaufe Fahrzeuge aus deiner eigenen Garage an Händler.
 
-Preis (in €)
+Händler kalkulieren eigene Ankaufspreise und lassen sich mit passenden Argumenten (z. B. Scheckheftpflege, neuer TÜV) hochhandeln.
 
-Unterklassen:
+Mehrere Händler zur Auswahl:
 
-Auto
+Verschiedene Händler mit individuellem Sortiment und unterschiedlichen Geduldsstufen (z. B. Autohaus Müller, Gebrauchtwagen-Paradies, Zweirad & Auto Schmidt).
 
-Erbt von Fahrzeug
+Garagen- & Budgetverwaltung:
 
-Zusätzliche Eigenschaft: Anzahl Sitzplätze
+Guthaben wird bei Käufen abgezogen und bei Verkäufen gutgeschrieben.
+
+Startausstattung des Spielers mit einem Erstfahrzeug (Opel Corsa).
+
+Technologien & Anforderungen
+
+Sprache: C#
+
+Framework: .NET Framework 4.7.2
+
+Projekttyp: Konsolenanwendung (Console Application)
+
+Entwicklungsumgebung: Visual Studio 2017 / 2019 / 2022
+
+Projektstruktur
+
+Fahrzeugverkauf/
+│
+├── App.config              # Konfigurationsdatei (.NET Framework Version)
+├── Fahrzeug.cs             # Basisklasse 'Fahrzeug' sowie 'Auto' und 'Motorrad'
+├── Haendler.cs             # Logik für Händler, Bestand & Verhandlungsführung
+├── Kunde.cs                # Kundendaten, Budget & Garagenverwaltung
+├── Program.cs              # Hauptmenü, Menüführung & Anwendungseinstieg
+├── Fahrzeugverkauf.csproj  # Visual Studio Projektdatei
+├── Changelog.txt           # Detaillierte Versionshistorie (V1.0.0 bis V2.2.0)
+└── Hinweis.txt             # Hinweis auf fiktionale Daten
 
 
-Motorrad
+Installation & Start
 
-Erbt von Fahrzeug
+Repository klonen oder herunterladen:
+Entpacke das Projekt in einen Ordner deiner Wahl.
 
+In Visual Studio öffnen:
+Doppelklicke auf die Datei Fahrzeugverkauf.csproj oder öffne das Projekt über Visual Studio (Datei ➔ Öffnen ➔ Projekt/Projektmappe).
 
-Akteure
+Projekt bauen und ausführen:
+Drücke F5 oder klicke auf Starten, um die Anwendung zu kompilieren und in der Konsole auszuführen.
 
-Händler
+Bedienung
 
-Verwaltet den eigenen Fahrzeugbestand (Hinzufügen, Entfernen, Auflisten).
+Start: Gib zu Beginn deinen Vornamen, Nachnamen und dein Startbudget ein.
 
-Prüft und akzeptiert/lehnt Preisvorschläge von Kunden ab.
+Hauptmenü:
 
-Kunde
+[1] Alle Händler & Bestände: Verschaffe dir einen Überblick über alle verfuegbaren Autos und Motorräder.
 
-Besitzt ein festgelegtes Budget.
+[2] Fahrzeug kaufen: Wähle einen Händler und ein Fahrzeug aus, um in die Preisverhandlung einzusteigen.
 
-Kann Fahrzeuge durchsuchen und Kaufangebote abgeben.
+[3] Garage anzeigen: Sieh dir deine aktuell besessenen Fahrzeuge an.
 
-Features & Funktionalitäten
+[4] Fahrzeug verkaufen: Biete ein Fahrzeug aus deiner Garage einem Händler zum Ankauf an und verhandle den Verkaufspreis.
 
-Grundfunktionen
+[x] Beenden: Beendet das Programm.
 
-Fahrzeugverwaltung: Anlegen und Anzeigen von Autos und Motorrädern mit spezifischen Eigenschaften.
+Versionshistorie (Auszug)
 
-Kundenverwaltung: Erstellen von Kunden mit individuellem Budget.
+V2.2.0: Ankauf-System (Fahrzeugverkauf durch den Kunden an Händler) und Garagen-Feature integriert.
 
-Kaufabwicklung:
+V2.1.0: Rundenbasiertes Verhandlungssystem mit Strategien (Argumente, Barzahlung) & Händler-Geduldssystem.
 
-Abgabe von Preisvorschlägen durch den Kunden.
+V2.0.0: Unterstützung für mehrere Händler und erweitertes Fahrzeugangebot.
 
-Entscheidung durch den Händler.
+V1.1.0: Verhandlungs-Logik und Angebotssystem eingeführt.
 
-Automatische Budgetprüfung (Kauf nur bei ausreichendem Budget möglich).
+V1.0.0: Erstveröffentlichung mit Grundstruktur (Klassen, Bestand & Konsolenmenü).
 
-Aktualisierung des Budgets und Entfernung des gekauften Fahrzeugs aus dem Bestand.
+Siehe Changelog.txt für die vollständige Änderungshistorie.
 
-Erweiterte Features
+ℹ️ Hinweis
 
-Mehrere Händler: Unterstützung verschiedener Autohäuser mit jeweils eigenem Fahrzeugbestand.
-
-Nachverhandeln: Möglichkeit für Gegenangebote/neue Preisvorschläge (NeuerPreis), falls ein Angebot abgelehnt wird.
-
-Weiterkaufen Loop: Interaktive Abfrage (y/n), ob der Kunde weitere Einkäufe tätigen möchte.
-
-Fahrzeugverkauf durch Kunden: Option für Kunden, eigene Fahrzeuge wieder zu verkaufen.
-
-Interaktive Steuerung: Benutzerfreundliche Menüführung in der Konsole.
-
-Voraussetzungen & Installation
-
-Anforderungen
-
-.NET SDK (Version 6.0 oder neuer)
-
-Visual Studio 2022 (oder Visual Studio Code mit C#-Erweiterung)
-
-Projekt in Visual Studio öffnen
-
-Repository klonen oder ZIP-Archiv entpacken.
-
-Die Datei Fahrzeugverkauf.sln in Visual Studio öffnen.
-
-Mit F5 oder Strg + F5 das Projekt bauen und starten.
-
-🚀 NutzungBeispiel (Konsolenablauf)
-
-=== Willkommen beim Fahrzeugverkauf ===
-
-Verfügbare Händler:
-1. Autohaus Schmidt (Audi, BMW)
-2. Zweirad Meyer (Aprilia, Honda)
-
-Wähle einen Händler: 1
-
-[Autohaus Schmidt - Fahrzeugbestand]
-1. Audi A4 | 190 PS | 54L Tank | 5 Sitze | 25.000 €
-2. BMW M3  | 510 PS | 59L Tank | 5 Sitze | 60.000 €
-
-Dein aktuelles Budget: 30.000 €
-Welches Fahrzeug möchtest du kaufen? 1
-
-Gib deinen Preisvorschlag ein (€): 23500
-Händler entscheidet... 
-[Händler]: Angebot akzeptiert!
-
-Kauf erfolgreich!
-Neues Budget: 6.500 €
-Möchtest du weiter einkaufen? (y/n): n
+Dieses Programm ist vollständig fiktional. Alle Namen, Adressen, Fahrzeuge und Beträge dienen lediglich Demonstrations- und Testzwecken.
