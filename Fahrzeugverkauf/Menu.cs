@@ -26,6 +26,7 @@ namespace Fahrzeugverkauf
                 }
                 else if (wahl == "2")
                 {
+                    Console.Clear();
                     verarbeiteKaufMenu();
                 }
                 else if (wahl == "3")
@@ -36,10 +37,12 @@ namespace Fahrzeugverkauf
                 }
                 else if (wahl == "4")
                 {
+                    Console.Clear();
                     verarbeiteVerkaufMenu();
                 }
                 else if (wahl == "x")
                 {
+                    Console.Clear();
                     Dialog.zeigeProgrammEnde();
                     break;
                 }
