@@ -47,9 +47,11 @@
     <Compile Include="Fahrzeug.cs" />
     <Compile Include="Haendler.cs" />
     <Compile Include="Kunde.cs" />
+    <Compile Include="LagerService.cs" />
     <Compile Include="Menu.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VerhandlungsService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

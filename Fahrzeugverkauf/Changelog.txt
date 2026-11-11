@@ -84,7 +84,8 @@ GEÄNDERT:
 - Code-Dokumentation:
   * Aktualisierung und Ergänzung sämtlicher Inline-Kommentare für die neuen interaktiven Verhandlungs- und Strategiefunktionen.
 
-  [V2.2.0] - Fahrzeugverkauf durch Kunden (Ankauf-System)
+
+[V2.2.0] - Fahrzeugverkauf durch Kunden (Ankauf-System)
 -------------------------------------------------------------------------------------------------------------
 HINZUGEFÜGT:
 - Klasse 'Kunde':
@@ -99,7 +100,8 @@ HINZUGEFÜGT:
   * Neue Hauptmenü-Optionen zur Ansicht der eigenen Garage ([3]) und zum Verkauf eigener Fahrzeuge an einen Händler ([4]).
   * Vollständige Quellcode-Dokumentation aller neuen Funktionen durch ausführliche Inline-Kommentare.
 
-  [V3.0.0] - JSON-Datenanbindung, Menü-Refactoring & Überarbeitete Verhandlungslogik
+
+[V3.0.0] - JSON-Datenanbindung, Menü-Refactoring & Überarbeitete Verhandlungslogik
 -------------------------------------------------------------------------------------------------------------
 HINZUGEFÜGT:
 - Dynamische JSON-Datenanbindung (Program.cs):
@@ -124,5 +126,20 @@ GEÄNDERT:
 - Program.cs:
   * Umgestaltung der Verhandlungs-Schleifen ('FuehreKaufVerhandlung', 'FuehreAnkaufVerhandlung') zur Verwendung des neuen 'VerhandlungsErgebnis'-Enums.
   * Umstellung auf rein statische Hilfsmethoden für die Konsolenausgabe und Menüsteuerung.
+
+
+[V3.1.0] - Entkopplung der Verhandlungslogik & Code-Qualitätsverbesserungen
+-------------------------------------------------------------------------------------------------------------
+HINZUGEFÜGT:
+- Neue Klasse 'VerhandlungsService.cs':
+  * Auslagerung der Verhandlungsabläufe ('fuehreKaufVerhandlung', 'fuehreAnkaufVerhandlung') aus 'Program.cs'.
+  * Bessere Trennung von Anwendungsstart, Menüsteuerung und Verhandlungslogik (Single Responsibility Principle).
+
+GEÄNDERT:
+- Code-Bereinigung & Behebung von IDE-Warnungen (z. B. IDE0044, IDE0028):
+  * Kennzeichnung privater, unveränderlicher Felder als 'readonly' in 'Fahrzeug.cs', 'Haendler.cs', 'Kunde.cs' und 'Menu.cs'.
+  * Vereinfachung der Garagen-Initialisierung in 'Kunde.cs' mittels Collection-Initializer.
+- Projektstruktur ('Fahrzeugverkauf.csproj'):
+  * Einbindung der neuen Quelldateien 'LagerService.cs' und 'VerhandlungsService.cs' in das Projekt.
 
 =============================================================================================================
