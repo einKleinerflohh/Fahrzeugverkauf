@@ -2,11 +2,8 @@
 
 namespace Fahrzeugverkauf
 {
-    // Abstrakte Basisklasse für alle Fahrzeuge im System.
-    // Kann nicht direkt instanziiert werden, dient als Vorlage für konkrete Fahrzeugtypen.
     public abstract class Fahrzeug
     {
-        // Öffentliche Eigenschaften für Fahrzeugdaten
         public string marke { get; set; }
         public string modell { get; set; }
         public double leistungInPS { get; set; }
@@ -14,7 +11,9 @@ namespace Fahrzeugverkauf
         public double preis { get; set; }
         public string zustand { get; set; }
 
-        // Vordefinierte Zustände für die zufällige Zuweisung beim Erstellen
+        private const double PreisVariationsMinimumFaktor = 0.95;
+        private const double PreisVariationsBereich = 0.1;
+
         private static readonly string[] zustandsListe = {
             "Sehr gut",
             "Gebraucht mit leichten Spuren",
@@ -23,10 +22,8 @@ namespace Fahrzeugverkauf
             "Fast wie neu"
         };
 
-        // Zufallsgenerator für Preisvariation und Zustand
         private static readonly Random rnd = new Random();
 
-        // Konstruktor: Initialisiert die Basisdaten und berechnet dynamisch Preis & Zustand
         public Fahrzeug(string nMarke, string nModell, double nLeistungInPS, double nTankInLiter, double nPreis)
         {
             marke = nMarke;
@@ -34,43 +31,36 @@ namespace Fahrzeugverkauf
             leistungInPS = nLeistungInPS;
             tankInLiter = nTankInLiter;
 
-            // Preis variiert zufällig um +/- 5% vom Basispreis
-            double faktor = 0.95 + rnd.NextDouble() * 0.1;
+            double faktor = PreisVariationsMinimumFaktor + rnd.NextDouble() * PreisVariationsBereich;
             preis = Math.Round(nPreis * faktor, 2);
 
-            // Zufälliger Zustand aus der Vorlage auswählen
             zustand = zustandsListe[rnd.Next(zustandsListe.Length)];
         }
 
-        // Virtuelle Methode zur Konsolenausgabe der Fahrzeugdaten (kann von Unterklassen erweitert werden)
         public virtual void fahrzeugAnzeigen()
         {
-            Console.WriteLine($"Marke: {marke}, Modell: {modell}, Leistung: {leistungInPS} PS, Tank: {tankInLiter} L, Preis: {preis} EUR (Zustand: {zustand})");
+            Dialog.zeigeFahrzeugDetails(marke, modell, leistungInPS, tankInLiter, preis, zustand);
+            Console.WriteLine();
         }
     }
 
-    // Konkrete Unterklasse für Autos
     public class Auto : Fahrzeug
     {
-        // Zusätzliche spezifische Eigenschaft für Autos
         public int anzahlSitzplaetze { get; set; }
 
-        // Konstruktor leitet Parameter an die Basisklasse weiter
         public Auto(string nMarke, string nModell, double nLeistungInPS, double nTankInLiter, double nPreis, int nAnzahlSitzplaetze)
             : base(nMarke, nModell, nLeistungInPS, nTankInLiter, nPreis)
         {
             anzahlSitzplaetze = nAnzahlSitzplaetze;
         }
 
-        // Überschreibt die Anzeige der Basisklasse um Auto-spezifische Daten
         public override void fahrzeugAnzeigen()
         {
-            base.fahrzeugAnzeigen();
-            Console.WriteLine($" -> Fahrzeugtyp: Auto, Sitzplätze: {anzahlSitzplaetze}");
+            Dialog.zeigeFahrzeugDetails(marke, modell, leistungInPS, tankInLiter, preis, zustand);
+            Dialog.zeigeAutoDetails(anzahlSitzplaetze);
         }
     }
 
-    // Konkrete Unterklasse für Motorräder
     public class Motorrad : Fahrzeug
     {
         public Motorrad(string nMarke, string nModell, double nLeistungInPS, double nTankInLiter, double nPreis)
@@ -78,11 +68,10 @@ namespace Fahrzeugverkauf
         {
         }
 
-        // Überschreibt die Anzeige der Basisklasse um Motorrad-spezifische Daten
         public override void fahrzeugAnzeigen()
         {
-            base.fahrzeugAnzeigen();
-            Console.WriteLine(" -> Fahrzeugtyp: Motorrad");
+            Dialog.zeigeFahrzeugDetails(marke, modell, leistungInPS, tankInLiter, preis, zustand);
+            Dialog.zeigeMotorradDetails();
         }
     }
 }

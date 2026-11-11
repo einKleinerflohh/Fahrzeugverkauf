@@ -3,19 +3,46 @@ using System.Collections.Generic;
 
 namespace Fahrzeugverkauf
 {
-    // Repräsentiert einen Autohändler mit eigenem Fahrzeugbestand, Gedulds- und Stimmungssystem
     public class Haendler
     {
         public string haendlerName { get; set; }
         public int geduld { get; set; }
         public string aktuelleStimmung { get; private set; }
 
-        // Interner Fahrzeugbestand des Händlers
         private readonly List<Fahrzeug> fahrzeugBestand = new List<Fahrzeug>();
         private readonly Random rnd = new Random();
 
-        // Mögliche Stimmungen, die das Verhandlungsverhalten beeinflussen
         private readonly string[] stimmungen = { "Gut gelaunt", "Genervt", "Unberechenbar", "Streng", "Entspannt" };
+
+        // Konstanten für Verhandlungsgrenzen und Faktoren
+        private const double StimmungseinflussStark = 0.04;
+        private const double StimmungseinflussZufallSpanne = 0.1;
+        private const double StimmungseinflussZufallOffset = 0.05;
+
+        private const double SchmerzgrenzeKaufBasis = 0.78;
+        private const double SchmerzgrenzeKaufVarianz = 0.08;
+        private const double FrechheitsgrenzeBasis = 0.65;
+        private const double FrechheitsgrenzeVarianz = 0.06;
+
+        private const double SprungFaktorMin = 0.3;
+        private const double SprungFaktorSpanne = 0.4;
+
+        private const double RabattArgumentMin = 0.02;
+        private const double RabattArgumentSpanne = 0.06;
+
+        private const double BarAngebotBasis = 0.88;
+        private const double BarAngebotVarianz = 0.08;
+
+        private const double SchmerzgrenzeAnkaufBasis = 0.82;
+        private const double SchmerzgrenzeAnkaufVarianz = 0.06;
+        private const double AnkaufUeberzogenLimit = 1.25;
+
+        private const int MinVersucheRunden = 2;
+        private const int MaxVersucheRunden = 6; // Obergrenze für Random.Next (exklusive)
+
+        private const double StimmungChanceGutGelaunt = 0.8;
+        private const double StimmungChanceGenervt = 0.3;
+        private const double StimmungChanceStandard = 0.55;
 
         public Haendler() { }
 
@@ -23,91 +50,77 @@ namespace Fahrzeugverkauf
         {
             haendlerName = name;
             geduld = startGeduld;
-            // Zufällige Stimmung beim Erstellen zuweisen
             aktuelleStimmung = stimmungen[rnd.Next(stimmungen.Length)];
         }
 
-        // Methoden zur Bestandsverwaltung
         public void fahrzeugHinzufuegen(Fahrzeug fahrzeug) => fahrzeugBestand.Add(fahrzeug);
         public void fahrzeugEntfernen(Fahrzeug fahrzeug) => fahrzeugBestand.Remove(fahrzeug);
         public List<Fahrzeug> getBestand() => fahrzeugBestand;
 
-        // Generiert die maximale Anzahl der Verhandlungsrunden für ein Gespräch und wechselt die Stimmung
         public int generiereMaxVersuche()
         {
             aktuelleStimmung = stimmungen[rnd.Next(stimmungen.Length)];
-            return rnd.Next(2, 6);
+            return rnd.Next(MinVersucheRunden, MaxVersucheRunden);
         }
 
-        // Zentrale Verhandlungslogik für Kauf- und Ankaufgespräche.
-        // Berechnet Preisänderungen, Geduldsabzug und Verhandlungsergebnisse basierend auf der Kundenaktion.
         public VerhandlungsErgebnis verarbeiteVerhandlung(bool istKauf, Fahrzeug fahrzeug, int aktion, double input, ref double preis, ref int geduld)
         {
             if (istKauf)
             {
-                // Kaufverhandlung (Kunde möchte ein Fahrzeug vom Händler kaufen)
+                double stimmungsFaktor = aktuelleStimmung == "Gut gelaunt" || aktuelleStimmung == "Entspannt" ? StimmungseinflussStark :
+                                         (aktuelleStimmung == "Genervt" || aktuelleStimmung == "Streng" ? -StimmungseinflussStark : (rnd.NextDouble() * StimmungseinflussZufallSpanne - StimmungseinflussZufallOffset));
 
-                // Errechnung des Stimmungseinflusses auf die Schmerzgrenze
-                double stimmungsFaktor = aktuelleStimmung == "Gut gelaunt" || aktuelleStimmung == "Entspannt" ? 0.04 :
-                                         (aktuelleStimmung == "Genervt" || aktuelleStimmung == "Streng" ? -0.04 : (rnd.NextDouble() * 0.1 - 0.05));
+                double schmerzgrenze = fahrzeug.preis * (SchmerzgrenzeKaufBasis + rnd.NextDouble() * SchmerzgrenzeKaufVarianz + stimmungsFaktor);
+                double frechheitsgrenze = fahrzeug.preis * (FrechheitsgrenzeBasis + rnd.NextDouble() * FrechheitsgrenzeVarianz);
 
-                // Schmerzgrenze (schmerzgrenze) und Frechheitsgrenze (frechheitsgrenze) des Händlers berechnen
-                double schmerzgrenze = fahrzeug.preis * (0.78 + rnd.NextDouble() * 0.08 + stimmungsFaktor);
-                double frechheitsgrenze = fahrzeug.preis * (0.65 + rnd.NextDouble() * 0.06);
-
-                if (aktion == 1) // Konkretes Gebot
+                if (aktion == 1)
                 {
-                    if (input < frechheitsgrenze) return VerhandlungsErgebnis.Frechheit; // Zu niedrig: Händler bricht ab
-                    if (input >= preis) return VerhandlungsErgebnis.Deal; // Gebot erreicht geforderten Preis
+                    if (input < frechheitsgrenze) return VerhandlungsErgebnis.Frechheit;
+                    if (input >= preis) return VerhandlungsErgebnis.Deal;
 
-                    geduld--; // Geduld sinkt bei noch nicht akzeptiertem Gebot
-                    double sprungFaktor = 0.3 + rnd.NextDouble() * 0.4;
-                    // Händler kommt dem Kunden preislich entgegen
+                    geduld--;
+                    double sprungFaktor = SprungFaktorMin + rnd.NextDouble() * SprungFaktorSpanne;
                     preis = Math.Max(schmerzgrenze, Math.Round(preis - (preis - input) * sprungFaktor, 2));
                     return VerhandlungsErgebnis.Entgegenkommen;
                 }
-                if (aktion == 2) // Argument vorbringen
+                if (aktion == 2)
                 {
-                    // Wahrscheinlichkeit des Erfolgs hängt von der aktuellen Stimmung ab
-                    bool erfolg = rnd.NextDouble() < (aktuelleStimmung == "Gut gelaunt" ? 0.8 : (aktuelleStimmung == "Genervt" ? 0.3 : 0.55));
+                    bool erfolg = rnd.NextDouble() < (aktuelleStimmung == "Gut gelaunt" ? StimmungChanceGutGelaunt : (aktuelleStimmung == "Genervt" ? StimmungChanceGenervt : StimmungChanceStandard));
                     if (erfolg)
                     {
-                        double rabatt = 0.02 + rnd.NextDouble() * 0.06;
+                        double rabatt = RabattArgumentMin + rnd.NextDouble() * RabattArgumentSpanne;
                         preis = Math.Max(schmerzgrenze, Math.Round(preis - fahrzeug.preis * rabatt, 2));
                         return VerhandlungsErgebnis.ArgumentAngenommen;
                     }
                     geduld--;
                     return VerhandlungsErgebnis.ArgumentAbgelehnt;
                 }
-                if (aktion == 3) // Barzahlungs-Joker
+                if (aktion == 3)
                 {
-                    double barFaktor = 0.88 + rnd.NextDouble() * 0.08;
+                    double barFaktor = BarAngebotBasis + rnd.NextDouble() * BarAngebotVarianz;
                     preis = Math.Max(schmerzgrenze, Math.Round(preis * barFaktor, 2));
                     return VerhandlungsErgebnis.BarAngebotBerechnet;
                 }
             }
             else
             {
-                // Ankaufverhandlung (Kunde möchte sein Fahrzeug an den Händler verkaufen)
-
-                double schmerzgrenzeHaendler = fahrzeug.preis * (0.82 + rnd.NextDouble() * 0.06); // Schmerzgrenze des Händlers beim Ankauf
-                if (aktion == 1) // Preisvorstellung des Kunden
+                double schmerzgrenzeHaendler = fahrzeug.preis * (SchmerzgrenzeAnkaufBasis + rnd.NextDouble() * SchmerzgrenzeAnkaufVarianz);
+                if (aktion == 1)
                 {
-                    if (input > fahrzeug.preis * 1.25) { geduld--; return VerhandlungsErgebnis.Ueberzogen; } // Übertriebener Preis
-                    if (input <= schmerzgrenzeHaendler) return VerhandlungsErgebnis.Deal; // Händler akzeptiert das Angebot
+                    if (input > fahrzeug.preis * AnkaufUeberzogenLimit) { geduld--; return VerhandlungsErgebnis.Ueberzogen; }
+                    if (input <= schmerzgrenzeHaendler) return VerhandlungsErgebnis.Deal;
 
                     geduld--;
-                    double sprungFaktor = 0.3 + rnd.NextDouble() * 0.4;
-                    // Händler erhöht sein Ankaufgebot schrittweise
+                    double sprungFaktor = SprungFaktorMin + rnd.NextDouble() * SprungFaktorSpanne;
                     preis = Math.Min(schmerzgrenzeHaendler, Math.Round(preis + (input - preis) * sprungFaktor, 2));
                     return VerhandlungsErgebnis.Gegenvorschlag;
                 }
-                if (aktion == 2) // Argument für höheren Preis
+                if (aktion == 2)
                 {
-                    preis = Math.Min(schmerzgrenzeHaendler, Math.Round(preis + fahrzeug.preis * (0.02 + rnd.NextDouble() * 0.05), 2));
+                    preis = Math.Min(schmerzgrenzeHaendler, Math.Round(preis + fahrzeug.preis * (RabattArgumentMin + rnd.NextDouble() * (RabattArgumentSpanne + 0.01)), 2));
                     return VerhandlungsErgebnis.ArgumentAngenommen;
                 }
-                if (aktion == 3) // Händler-Angebot direkt akzeptieren
+                if (aktion == 3)
                 {
                     return VerhandlungsErgebnis.Deal;
                 }
@@ -116,7 +129,6 @@ namespace Fahrzeugverkauf
         }
     }
 
-    // Enum zur Verhandlungs-Auswertung
     public enum VerhandlungsErgebnis
     {
         Deal,
