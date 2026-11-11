@@ -3,52 +3,55 @@ using System.Collections.Generic;
 
 namespace Fahrzeugverkauf
 {
-    // Repräsentiert den Kunden mit Personalien, Budget und eigener Garage
     public class Kunde
     {
         public string vorname { get; set; }
         public string name { get; set; }
         public double budget { get; set; }
 
-        // Liste der Fahrzeuge in Kundenbesitz
         public List<Fahrzeug> fahrzeugGarage { get; set; }
 
         private static readonly Random rnd = new Random();
 
-        // Konstruktor: Initialisiert den Kunden und stellt ein Erstfahrzeug bereit
+        private const double BudgetVariationsMinimum = 0.9;
+        private const double BudgetVariationsSpanne = 0.2;
+
+        private const string StandardFahrzeugMarke = "Opel";
+        private const string StandardFahrzeugModell = "Corsa";
+        private const double StandardFahrzeugLeistung = 75;
+        private const double StandardFahrzeugTank = 45.0;
+        private const double StandardFahrzeugPreis = 3500.0;
+        private const int StandardFahrzeugSitzplaetze = 3;
+
         public Kunde(string nVorname, string nName, double nBudget)
         {
             vorname = nVorname;
             name = nName;
 
-            // Budget leicht variieren (+/- 10%)
-            double budgetFaktor = 0.9 + rnd.NextDouble() * 0.2;
+            double budgetFaktor = BudgetVariationsMinimum + rnd.NextDouble() * BudgetVariationsSpanne;
             budget = Math.Round(nBudget * budgetFaktor, 2);
 
-            // Erstausstattung mit einem Gebrauchtwagen (Opel Corsa)
             fahrzeugGarage = new List<Fahrzeug>
             {
-                new Auto("Opel", "Corsa", 75, 45.0, 3500.0, 3)
+                new Auto(StandardFahrzeugMarke, StandardFahrzeugModell, StandardFahrzeugLeistung, StandardFahrzeugTank, StandardFahrzeugPreis, StandardFahrzeugSitzplaetze)
             };
         }
 
-        // Gibt die Fahrzeuge in der eigenen Garage sowie das aktuelle Budget auf der Konsole aus
         public void garageAnzeigen()
         {
-            Console.WriteLine($"\n--- Fahrzeuggarage von {vorname} {name} (Budget: {budget} EUR) ---");
+            Dialog.zeigeGarageTitel(vorname, name, budget);
             if (fahrzeugGarage.Count == 0)
             {
-                Console.WriteLine("Deine Garage ist aktuell leer.");
-                Console.WriteLine("--------------------------------------");
+                Dialog.zeigeGarageLeer();
                 return;
             }
 
             for (int i = 0; i < fahrzeugGarage.Count; i++)
             {
-                Console.Write($"[{i + 1}] ");
+                Dialog.zeigeListeneintrag(i + 1);
                 fahrzeugGarage[i].fahrzeugAnzeigen();
             }
-            Console.WriteLine("--------------------------------------\n");
+            Dialog.zeigeGarageTrennlinie();
         }
     }
 }

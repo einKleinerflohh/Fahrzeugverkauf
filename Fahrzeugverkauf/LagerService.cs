@@ -5,13 +5,11 @@ using System.Web.Script.Serialization;
 
 namespace Fahrzeugverkauf
 {
-    // DTO (Data Transfer Object) zur Deserialisierung von Händlerdaten aus JSON
     public class HaendlerDto
     {
         public string haendlerName { get; set; }
     }
 
-    // DTO zur Deserialisierung von Fahrzeugdaten aus JSON
     public class FahrzeugDto
     {
         public string typ { get; set; }
@@ -24,15 +22,16 @@ namespace Fahrzeugverkauf
         public int anzahlSitzplaetze { get; set; }
     }
 
-    // Service zum Laden und Initialisieren der Händler- und Bestandsdaten aus JSON-Dateien
     public static class LagerService
     {
+        private const int GeduldMinimum = 2;
+        private const int GeduldMaximum = 6;
+
         public static List<Haendler> ladeLagerDaten()
         {
             List<Haendler> haendlerListe = new List<Haendler>();
             Random rnd = new Random();
 
-            // Zielpfad 'Data' im Anwendungsverzeichnis sicherstellen
             string dataDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
             if (!Directory.Exists(dataDirectory))
             {
@@ -44,7 +43,6 @@ namespace Fahrzeugverkauf
 
             try
             {
-                // 1. Händler aus 'haendler.json' einlesen
                 if (File.Exists(haendlerDatei))
                 {
                     string haendlerJson = File.ReadAllText(haendlerDatei);
@@ -53,19 +51,17 @@ namespace Fahrzeugverkauf
 
                     foreach (var haendlerDto in haendlerDtos)
                     {
-                        int zufallsGeduld = rnd.Next(2, 6);
+                        int zufallsGeduld = rnd.Next(GeduldMinimum, GeduldMaximum);
                         haendlerListe.Add(new Haendler(haendlerDto.haendlerName, zufallsGeduld));
                     }
                 }
                 else
                 {
-                    // Fallback, wenn Händler-JSON nicht vorhanden ist
-                    Console.WriteLine($"[Hinweis] '{haendlerDatei}' nicht gefunden. Standardwerte werden genutzt.");
-                    haendlerListe.Add(new Haendler("Autohaus Müller", rnd.Next(2, 6)));
-                    haendlerListe.Add(new Haendler("Gebrauchtwagen-Paradies", rnd.Next(2, 6)));
+                    Dialog.zeigeJsonFehler("haendler.json", haendlerDatei);
+                    haendlerListe.Add(new Haendler("Autohaus Müller", rnd.Next(GeduldMinimum, GeduldMaximum)));
+                    haendlerListe.Add(new Haendler("Gebrauchtwagen-Paradies", rnd.Next(GeduldMinimum, GeduldMaximum)));
                 }
 
-                // 2. Fahrzeuge aus 'auto.json' einlesen und den jeweiligen Händlern zuweisen
                 if (File.Exists(autoDatei))
                 {
                     string autoJson = File.ReadAllText(autoDatei);
@@ -84,7 +80,6 @@ namespace Fahrzeugverkauf
                             neuesFahrzeug = new Motorrad(fahrzeugDto.marke, fahrzeugDto.modell, fahrzeugDto.leistungInPS, fahrzeugDto.tankInLiter, fahrzeugDto.preis);
                         }
 
-                        // Fahrzeug dem zugewiesenen Händler hinzufügen
                         var zielHaendler = haendlerListe.Find(haendler => haendler.haendlerName.Equals(fahrzeugDto.haendlerName, StringComparison.OrdinalIgnoreCase));
                         if (zielHaendler != null)
                         {
@@ -92,19 +87,18 @@ namespace Fahrzeugverkauf
                         }
                         else if (haendlerListe.Count > 0)
                         {
-                            // Erstbesten Händler als Rückfalloption nehmen
                             haendlerListe[0].fahrzeugHinzufuegen(neuesFahrzeug);
                         }
                     }
                 }
                 else
                 {
-                    Console.WriteLine($"[Hinweis] '{autoDatei}' nicht gefunden.");
+                    Dialog.zeigeJsonFehler("auto.json", autoDatei);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[Fehler beim Laden der JSON-Dateien]: {ex.Message}");
+                Dialog.zeigeAllgemeinerFehler(ex.Message);
             }
 
             return haendlerListe;

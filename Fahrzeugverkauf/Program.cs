@@ -14,16 +14,16 @@ namespace Fahrzeugverkauf
             Console.WriteLine("==============================================\n");
 
             // 1. Kundendaten erfassen
-            string vorname = Menu.leseEingabe("Bitte gib deinen Vornamen ein: ");
-            string nachname = Menu.leseEingabe("Bitte gib deinen Nachnamen ein: ");
+            string vorname = Dialog.leseEingabe("Bitte gib deinen Vornamen ein: ");
+            string nachname = Dialog.leseEingabe("Bitte gib deinen Nachnamen ein: ");
 
             double budget = 0;
             while (budget <= 0)
             {
-                string budgetInput = Menu.leseEingabe("Bitte gib dein Startbudget (in EUR) ein: ");
+                string budgetInput = Dialog.leseEingabe("Bitte gib dein Startbudget (in EUR) ein: ");
                 if (!double.TryParse(budgetInput, out budget) || budget <= 0)
                 {
-                    Menu.printNachricht("Ungültiges Budget. Bitte gib eine positive Zahl ein.");
+                    Dialog.printNachricht("Ungültiges Budget. Bitte gib eine positive Zahl ein.");
                 }
             }
 
