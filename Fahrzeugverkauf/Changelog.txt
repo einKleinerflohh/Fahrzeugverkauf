@@ -99,4 +99,30 @@ HINZUGEFÜGT:
   * Neue Hauptmenü-Optionen zur Ansicht der eigenen Garage ([3]) und zum Verkauf eigener Fahrzeuge an einen Händler ([4]).
   * Vollständige Quellcode-Dokumentation aller neuen Funktionen durch ausführliche Inline-Kommentare.
 
+  [V3.0.0] - JSON-Datenanbindung, Menü-Refactoring & Überarbeitete Verhandlungslogik
+-------------------------------------------------------------------------------------------------------------
+HINZUGEFÜGT:
+- Dynamische JSON-Datenanbindung (Program.cs):
+  * Automatisches Erstellen eines 'Data'-Ordners im Anwendungsverzeichnis.
+  * Einlesen von Händler- ('Data/haendler.json') und Fahrzeugdaten ('Data/auto.json') über 'JavaScriptSerializer'.
+  * Dynamische Zuweisung einer zufälligen Händler-Geduld beim Programmstart.
+  * Fallback-Mechanismus mit Standard-Händlern, falls Dateien fehlen.
+- Modulare Menüstruktur (Menu.cs):
+  * Auslagerung der Benutzeroberflächen- und Ablaufsteuerung in eine eigene Klasse 'Menu'.
+  * Entkopplung der Hauptmenü-Navigation und Untermenüs (Kauf/Verkauf).
+- Enum & Strukturierung für Verhandlungsergebnisse:
+  * Einführung des Enums 'VerhandlungsErgebnis' in 'Haendler.cs' zur übersichtlichen Auswertung von Verhandlungsaktionen.
+- Dynamische Stimmung der Händler:
+  * Einführung von Eigenschaft 'aktuelleStimmung' mit Einfluss auf die Verhandlungsbereitschaft und Schmerzgrenzen.
+
+GEÄNDERT:
+- Haendler.cs:
+  * Auslagerung der Verhandlungsberechnung in die zentrale Methode 'VerarbeiteVerhandlung'.
+  * Zusammenführung von Kauf- und Ankauf-Logik in eine flexibel steuerbare Verhandlungsmethode.
+- Fahrzeug.cs:
+  * Dynamische Preisvariations-Logik (+/- 5 %) und zufällige Zustandsvergabe beim Instanziieren von Fahrzeugen.
+- Program.cs:
+  * Umgestaltung der Verhandlungs-Schleifen ('FuehreKaufVerhandlung', 'FuehreAnkaufVerhandlung') zur Verwendung des neuen 'VerhandlungsErgebnis'-Enums.
+  * Umstellung auf rein statische Hilfsmethoden für die Konsolenausgabe und Menüsteuerung.
+
 =============================================================================================================
