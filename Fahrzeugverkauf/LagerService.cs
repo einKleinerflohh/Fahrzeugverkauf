@@ -51,10 +51,10 @@ namespace Fahrzeugverkauf
                     var serializer = new JavaScriptSerializer();
                     var haendlerDtos = serializer.Deserialize<List<HaendlerDto>>(haendlerJson);
 
-                    foreach (var hDto in haendlerDtos)
+                    foreach (var haendlerDto in haendlerDtos)
                     {
                         int zufallsGeduld = rnd.Next(2, 6);
-                        haendlerListe.Add(new Haendler(hDto.haendlerName, zufallsGeduld));
+                        haendlerListe.Add(new Haendler(haendlerDto.haendlerName, zufallsGeduld));
                     }
                 }
                 else
@@ -72,20 +72,20 @@ namespace Fahrzeugverkauf
                     var serializer = new JavaScriptSerializer();
                     var fahrzeugDtos = serializer.Deserialize<List<FahrzeugDto>>(autoJson);
 
-                    foreach (var fDto in fahrzeugDtos)
+                    foreach (var fahrzeugDto in fahrzeugDtos)
                     {
                         Fahrzeug neuesFahrzeug;
-                        if (fDto.typ.Equals("Auto", StringComparison.OrdinalIgnoreCase))
+                        if (fahrzeugDto.typ.Equals("Auto", StringComparison.OrdinalIgnoreCase))
                         {
-                            neuesFahrzeug = new Auto(fDto.marke, fDto.modell, fDto.leistungInPS, fDto.tankInLiter, fDto.preis, fDto.anzahlSitzplaetze);
+                            neuesFahrzeug = new Auto(fahrzeugDto.marke, fahrzeugDto.modell, fahrzeugDto.leistungInPS, fahrzeugDto.tankInLiter, fahrzeugDto.preis, fahrzeugDto.anzahlSitzplaetze);
                         }
                         else
                         {
-                            neuesFahrzeug = new Motorrad(fDto.marke, fDto.modell, fDto.leistungInPS, fDto.tankInLiter, fDto.preis);
+                            neuesFahrzeug = new Motorrad(fahrzeugDto.marke, fahrzeugDto.modell, fahrzeugDto.leistungInPS, fahrzeugDto.tankInLiter, fahrzeugDto.preis);
                         }
 
                         // Fahrzeug dem zugewiesenen Händler hinzufügen
-                        var zielHaendler = haendlerListe.Find(h => h.haendlerName.Equals(fDto.haendlerName, StringComparison.OrdinalIgnoreCase));
+                        var zielHaendler = haendlerListe.Find(haendler => haendler.haendlerName.Equals(fahrzeugDto.haendlerName, StringComparison.OrdinalIgnoreCase));
                         if (zielHaendler != null)
                         {
                             zielHaendler.fahrzeugHinzufuegen(neuesFahrzeug);

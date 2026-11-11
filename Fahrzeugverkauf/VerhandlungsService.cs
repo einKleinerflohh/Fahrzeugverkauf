@@ -24,7 +24,7 @@ namespace Fahrzeugverkauf
                     return;
                 }
 
-                Console.WriteLine($"\n--- Runde {runde}/{maxVersuche} | Geduld: {geduld} | Aktueller Preis: {aktuellerPreis} EUR ---");
+                Console.WriteLine($"\n--- Runde {runde} | Aktueller Preis: {aktuellerPreis} EUR ---");
                 Console.WriteLine("[1] Konkretes Gebot abgeben");
                 Console.WriteLine("[2] Argument bringen (Zustand/Konkurrenz)");
                 Console.WriteLine("[3] Barzahlungs-Joker nutzen");
@@ -81,7 +81,7 @@ namespace Fahrzeugverkauf
                         break;
 
                     case VerhandlungsErgebnis.ArgumentAbgelehnt:
-                        Console.WriteLine($"\n[{h.haendlerName}]: Das Argument überzeugt mich nicht. Geduld sinkt!");
+                        Console.WriteLine($"\n[{h.haendlerName}]: Das Argument überzeugt mich nicht!");
                         break;
 
                     case VerhandlungsErgebnis.BarAngebotBerechnet:
@@ -115,7 +115,7 @@ namespace Fahrzeugverkauf
                     return;
                 }
 
-                Console.WriteLine($"\n--- Runde {runde}/{maxVersuche} | Geduld: {geduld} | Aktuelles Händlerangebot: {aktuellerPreis} EUR ---");
+                Console.WriteLine($"\n--- Runde {runde} | Aktuelles Händlerangebot: {aktuellerPreis} EUR ---");
                 Console.WriteLine("[1] Gegenangebot (Preisvorstellung) nennen");
                 Console.WriteLine("[2] Fahrzeugvorteil hervorheben (z.B. Scheckheft, neuer TÜV)");
                 Console.WriteLine("[3] Angebot des Händlers akzeptieren");
@@ -151,7 +151,7 @@ namespace Fahrzeugverkauf
                         return;
 
                     case VerhandlungsErgebnis.Ueberzogen:
-                        Console.WriteLine($"\n[{h.haendlerName}]: Das ist völlig überzogen! Geduld sinkt.");
+                        Console.WriteLine($"\n[{h.haendlerName}]: Das ist völlig überzogen!");
                         break;
 
                     case VerhandlungsErgebnis.Gegenvorschlag:
