@@ -33,6 +33,7 @@ namespace Fahrzeugverkauf
                 string wahl = Dialog.leseEingabe("Deine Aktion: ").ToLower();
                 if (wahl == "x")
                 {
+                    Console.Clear();
                     Console.WriteLine("\nVerhandlung abgebrochen.");
                     return;
                 }
@@ -59,37 +60,45 @@ namespace Fahrzeugverkauf
                             kunde.budget = Math.Round(kunde.budget, 2);
                             haendler.fahrzeugEntfernen(fahrzeug);
                             kunde.fahrzeugGarage.Add(fahrzeug);
+                            Console.Clear();
                             Console.WriteLine($"\nGlückwunsch! Du hast den {fahrzeug.marke} {fahrzeug.modell} für {aktuellerPreis} EUR gekauft.");
                             Console.WriteLine($"Neues Budget: {kunde.budget} EUR");
                         }
                         else
                         {
+                            Console.Clear();
                             Console.WriteLine("\n[Händler]: Wir haben einen Deal, aber dein Budget reicht leider nicht aus!");
                         }
                         return;
 
                     case VerhandlungsErgebnis.Frechheit:
+                        Console.Clear();
                         Console.WriteLine($"\n[{haendler.haendlerName}]: Das Gebot ist eine Frechheit! Auf Wiedersehen.");
                         return;
 
                     case VerhandlungsErgebnis.Entgegenkommen:
+                        Console.Clear();
                         Console.WriteLine($"\n[{haendler.haendlerName}]: Dein Gebot ist zu niedrig. Ich biete dir {aktuellerPreis} EUR.");
                         break;
 
                     case VerhandlungsErgebnis.ArgumentAngenommen:
+                        Console.Clear();
                         Console.WriteLine($"\n[{haendler.haendlerName}]: Gutes Argument! Neuer Preis: {aktuellerPreis} EUR.");
                         break;
 
                     case VerhandlungsErgebnis.ArgumentAbgelehnt:
+                        Console.Clear();
                         Console.WriteLine($"\n[{haendler.haendlerName}]: Das Argument überzeugt mich nicht!");
                         break;
 
                     case VerhandlungsErgebnis.BarAngebotBerechnet:
+                        Console.Clear();
                         Console.WriteLine($"\n[{haendler.haendlerName}]: Für Sofort-Barzahlung machen wir {aktuellerPreis} EUR!");
                         break;
 
                     default:
                         Console.WriteLine("\nUngültige Eingabe!");
+                        Console.Clear();
                         runde--; // Runde nicht verzählen bei Ungültigkeit
                         break;
                 }

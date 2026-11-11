@@ -7,6 +7,7 @@ namespace Fahrzeugverkauf
     {
         public static void zeigeHauptmenue(Kunde kundeObjekt)
         {
+            Console.Clear();
             Console.WriteLine($"\n--- HAUPTMENÜ --- (Kunde: {kundeObjekt.vorname} {kundeObjekt.name} | Budget: {kundeObjekt.budget} EUR)");
             Console.WriteLine("[1] Alle Händler & Bestände anzeigen");
             Console.WriteLine("[2] Fahrzeug bei einem Händler kaufen (Verhandeln)");
