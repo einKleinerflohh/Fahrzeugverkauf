@@ -8,11 +8,12 @@ Objektorientierte Datenstruktur:
 - Abstrakte Basisklasse Fahrzeug mit den Unterklassen Auto (inkl. Sitzplätzen) und Motorrad sowie automatischer Preisvariation und Zustandsvergabe.
 - Modular aufgebautes Kunden- und Händlersystem.
 
-JSON-Datenanbindung:
-- Automatisches Laden von Händler- ('haendler.json') und Fahrzeugdaten ('auto.json') aus einem separaten 'Data'-Verzeichnis.
+JSON-Datenanbindung & Lager-Service (LagerService.cs):
+- Automatisches Laden von Händler- ('haendler.json') und Fahrzeugdaten ('auto.json') aus einem separaten 'Data'-Verzeichnis via `LagerService`.
 - Fallback-Mechanismus mit Standardwerten bei fehlenden Konfigurationsdateien.
 
-Interaktives Verhandlungssystem (Kauf):
+Entkoppelte Verhandlungslogik (VerhandlungsService.cs):
+- Entkopplung der Kauf- und Ankauf-Verhandlungen von der Start- und Menüklasse.
 - Verschiedene Verhandlungsstrategien: Gebote abgeben, Argumente nutzen (Zustand bemängeln, Konkurrenzdruck) oder den Barzahlungs-Joker wählen.
 - Dynamische Händler-Geduld & Stimmungen: Geduld sinkt bei unfairen Geboten. Die aktuelle Stimmung des Händlers beeinflusst die Verhandlungsbereitschaft und Schmerzgrenzen. Bei unter 70 % des Preises greift die "Frechheitsgrenze" (Abbruch).
 
@@ -44,12 +45,14 @@ Fahrzeugverkauf/
 ├── Data/                   # Verzeichnis für JSON-Daten (haendler.json, auto.json)
 ├── App.config              # Konfigurationsdatei (.NET Framework Version)
 ├── Fahrzeug.cs             # Basisklasse 'Fahrzeug' sowie 'Auto' und 'Motorrad'
-├── Haendler.cs             # Logik für Händler, Bestand, Stimmungen & Verhandlungsführung
+├── Haendler.cs             # Logik für Händler, Bestand, Stimmungen & Verhandlungsberechnung
 ├── Kunde.cs                # Kundendaten, Budget & Garagenverwaltung
+├── LagerService.cs         # Service zum Laden und Verarbeiten der JSON-Bestandsdaten
 ├── Menu.cs                 # Modulare Menü- und Navigationssteuerung
-├── Program.cs              # Anwendungseinstieg, JSON-Deserialisierung & Konsolen-Hilfsmethoden
+├── Program.cs              # Anwendungseinstieg & Programminitialisierung
+├── VerhandlungsService.cs  # Ablaufsteuerung für Kauf- und Ankauf-Verhandlungen
 ├── Fahrzeugverkauf.csproj  # Visual Studio Projektdatei
-├── Changelog.txt           # Detaillierte Versionshistorie (V1.0.0 bis V3.0.0)
+├── Changelog.txt           # Detaillierte Versionshistorie (V1.0.0 bis V3.1.0)
 └── Hinweis.txt             # Hinweis auf fiktionale Daten
 
 Installation & Start
@@ -77,6 +80,7 @@ Hauptmenü:
 
 Versionshistorie (Auszug)
 
+V3.1.0: Entkopplung der Verhandlungslogik in 'VerhandlungsService.cs', Auslagerung der Datenspeicherung in 'LagerService.cs', Code-Refactoring und Behebung von IDE-Warnungen (readonly, Collection-Initializer).
 V3.0.0: JSON-Datenanbindung, Auslagerung der Menülogik in 'Menu.cs' und Einführung von Händler-Stimmungen sowie zentralem Verhandlungs-Enum integriert.
 V2.2.0: Ankauf-System (Fahrzeugverkauf durch den Kunden an Händler) und Garagen-Feature integriert.
 V2.1.0: Rundenbasiertes Verhandlungssystem mit Strategien (Argumente, Barzahlung) & Händler-Geduldssystem.
