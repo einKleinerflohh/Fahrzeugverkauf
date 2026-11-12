@@ -13,8 +13,6 @@ namespace Fahrzeugverkauf
 
         private static readonly Random rnd = new Random();
 
-        private const double BudgetVariationsMinimum = 0.9;
-        private const double BudgetVariationsSpanne = 0.2;
 
         private const string StandardFahrzeugMarke = "Opel";
         private const string StandardFahrzeugModell = "Corsa";
@@ -27,9 +25,7 @@ namespace Fahrzeugverkauf
         {
             vorname = nVorname;
             name = nName;
-
-            double budgetFaktor = BudgetVariationsMinimum + rnd.NextDouble() * BudgetVariationsSpanne;
-            budget = Math.Round(nBudget * budgetFaktor, 2);
+            budget = Math.Round(nBudget, 2);
 
             fahrzeugGarage = new List<Fahrzeug>
             {
