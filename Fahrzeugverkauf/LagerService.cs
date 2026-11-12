@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Web.Script.Serialization;
+using System.Text.Json;
 
 namespace Fahrzeugverkauf
 {
@@ -41,18 +41,26 @@ namespace Fahrzeugverkauf
             string haendlerDatei = Path.Combine(dataDirectory, "haendler.json");
             string autoDatei = Path.Combine(dataDirectory, "auto.json");
 
+            // Option für case-insensitive Property-Names beim Deserialisieren von JSON
+            var jsonOptions = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+
             try
             {
                 if (File.Exists(haendlerDatei))
                 {
                     string haendlerJson = File.ReadAllText(haendlerDatei);
-                    var serializer = new JavaScriptSerializer();
-                    var haendlerDtos = serializer.Deserialize<List<HaendlerDto>>(haendlerJson);
+                    var haendlerDtos = JsonSerializer.Deserialize<List<HaendlerDto>>(haendlerJson, jsonOptions);
 
-                    foreach (var haendlerDto in haendlerDtos)
+                    if (haendlerDtos != null)
                     {
-                        int zufallsGeduld = rnd.Next(GeduldMinimum, GeduldMaximum);
-                        haendlerListe.Add(new Haendler(haendlerDto.haendlerName, zufallsGeduld));
+                        foreach (var haendlerDto in haendlerDtos)
+                        {
+                            int zufallsGeduld = rnd.Next(GeduldMinimum, GeduldMaximum);
+                            haendlerListe.Add(new Haendler(haendlerDto.haendlerName, zufallsGeduld));
+                        }
                     }
                 }
                 else
@@ -65,29 +73,31 @@ namespace Fahrzeugverkauf
                 if (File.Exists(autoDatei))
                 {
                     string autoJson = File.ReadAllText(autoDatei);
-                    var serializer = new JavaScriptSerializer();
-                    var fahrzeugDtos = serializer.Deserialize<List<FahrzeugDto>>(autoJson);
+                    var fahrzeugDtos = JsonSerializer.Deserialize<List<FahrzeugDto>>(autoJson, jsonOptions);
 
-                    foreach (var fahrzeugDto in fahrzeugDtos)
+                    if (fahrzeugDtos != null)
                     {
-                        Fahrzeug neuesFahrzeug;
-                        if (fahrzeugDto.typ.Equals("Auto", StringComparison.OrdinalIgnoreCase))
+                        foreach (var fahrzeugDto in fahrzeugDtos)
                         {
-                            neuesFahrzeug = new Auto(fahrzeugDto.marke, fahrzeugDto.modell, fahrzeugDto.leistungInPS, fahrzeugDto.tankInLiter, fahrzeugDto.preis, fahrzeugDto.anzahlSitzplaetze);
-                        }
-                        else
-                        {
-                            neuesFahrzeug = new Motorrad(fahrzeugDto.marke, fahrzeugDto.modell, fahrzeugDto.leistungInPS, fahrzeugDto.tankInLiter, fahrzeugDto.preis);
-                        }
+                            Fahrzeug neuesFahrzeug;
+                            if (fahrzeugDto.typ.Equals("Auto", StringComparison.OrdinalIgnoreCase))
+                            {
+                                neuesFahrzeug = new Auto(fahrzeugDto.marke, fahrzeugDto.modell, fahrzeugDto.leistungInPS, fahrzeugDto.tankInLiter, fahrzeugDto.preis, fahrzeugDto.anzahlSitzplaetze);
+                            }
+                            else
+                            {
+                                neuesFahrzeug = new Motorrad(fahrzeugDto.marke, fahrzeugDto.modell, fahrzeugDto.leistungInPS, fahrzeugDto.tankInLiter, fahrzeugDto.preis);
+                            }
 
-                        var zielHaendler = haendlerListe.Find(haendler => haendler.haendlerName.Equals(fahrzeugDto.haendlerName, StringComparison.OrdinalIgnoreCase));
-                        if (zielHaendler != null)
-                        {
-                            zielHaendler.fahrzeugHinzufuegen(neuesFahrzeug);
-                        }
-                        else if (haendlerListe.Count > 0)
-                        {
-                            haendlerListe[0].fahrzeugHinzufuegen(neuesFahrzeug);
+                            var zielHaendler = haendlerListe.Find(haendler => haendler.haendlerName.Equals(fahrzeugDto.haendlerName, StringComparison.OrdinalIgnoreCase));
+                            if (zielHaendler != null)
+                            {
+                                zielHaendler.fahrzeugHinzufuegen(neuesFahrzeug);
+                            }
+                            else if (haendlerListe.Count > 0)
+                            {
+                                haendlerListe[0].fahrzeugHinzufuegen(neuesFahrzeug);
+                            }
                         }
                     }
                 }
